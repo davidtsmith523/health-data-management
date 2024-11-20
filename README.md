@@ -36,7 +36,7 @@ To demostrate this security measure, we have emplaced a few rules to simulate HI
 To get a local copy of the code, clone it using git:
 
 ```
-git clone
+git clone https://github.com/davidtsmith523/health-data-management.git
 cd health-data-management-app
 ```
 
