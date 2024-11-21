@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import Swal from "sweetalert2";
 
 const Login = ({ setAuthenticatedUser }) => {
@@ -39,6 +39,12 @@ const Login = ({ setAuthenticatedUser }) => {
     setEmail(doctorEmail);
     setPassword(doctorPassword);
   };
+
+  // const handleHereClick = () => {
+  //   console.log("here")
+  // }
+
+
 
   const checkHours = () => {
     const date = new Date();
