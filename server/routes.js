@@ -1,5 +1,4 @@
 const express = require('express');
-// const db = require('./db.js');
 const router = express.Router();
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./healthcare_data.db');
@@ -15,9 +14,15 @@ router.get('/patient_info', (req, res) => {
 });
 
 // Add a new user
-router.post('/', (req, res) => {
+router.post('/add_patient_info', (req, res) => {
   const { name } = req.body;
-  db.run("INSERT INTO users (name) VALUES (?)", [name], function(err) {
+
+  const sql = `
+  INSERT INTO Patient_Info (first_name, last_name, dob, last_visit, action_required, status, condition, doctor_assigned) 
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+  const params = [req.body.firstName, req.body.lastName, req.body.dateOfBirth, req.body.lastVisit, req.body.action, req.body.status, req.body.condition, req.body.assignedTo];
+
+  db.run(sql, params, function(err) {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
