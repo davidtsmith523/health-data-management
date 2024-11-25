@@ -14,7 +14,7 @@ const Add = ({ patients, setPatients, setIsAdding }) => {
   const [action, setAction] = useState("");
   const [status, setStatus] = useState("");
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
 
     if (
@@ -48,10 +48,24 @@ const Add = ({ patients, setPatients, setIsAdding }) => {
       status
     };
 
-    patients.push(newPatients);
-    localStorage.setItem("patients_data", JSON.stringify(patients));
-    setPatients(patients);
-    setIsAdding(false);
+    try {
+      const response = await fetch('http://localhost:5000/api/users/add_patient_info', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newPatients),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      console.log('Server response:', responseData);
+    } catch (error) {
+      console.error('Error posting data:', error);
+    }
 
     Swal.fire({
       icon: "success",
