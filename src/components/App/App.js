@@ -10,8 +10,8 @@ const App = () => {
 
   useEffect(() => {
     const user = localStorage.getItem("authenticated_user");
-    const userEmail = localStorage.getItem("user_email");
-    setUserEmail(userEmail);
+    const email = localStorage.getItem("user_email");
+    setUserEmail(email);
     setAuthenticatedUser(user);
     setIsLoading(false);
   }, []);
@@ -29,7 +29,10 @@ const App = () => {
           userEmail={userEmail}
         />
       ) : (
-        <Login setAuthenticatedUser={setAuthenticatedUser} />
+        <Login
+          setAuthenticatedUser={setAuthenticatedUser}
+          setUserEmail={setUserEmail}
+        />
       )}
     </>
   );

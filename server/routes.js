@@ -10,29 +10,27 @@ router.post("/patient_info", (req, res) => {
   const { authenticatedUser, userEmail } = req.body;
 
   let query = "SELECT * FROM Patient_Info";
-  let params = [];
 
-  // If authenticatedUser is 'patient', filter by email
-  if (authenticatedUser === "patient" && userEmail) {
-    query += " WHERE email = ?";
-    params.push(userEmail);
-  }
-
-  db.all(query, params, (err, rows) => {
+  // Retrieve all patient info
+  db.all(query, [], (err, rows) => {
     if (err) {
       console.error(err.message);
       return res.status(500).json({ error: err.message });
     }
 
-    // Decrypt sensitive fields in each row
-    const decryptedRows = rows.map((row) => ({
-      ...row,
-      firstName: decrypt(row.firstName),
-      lastName: decrypt(row.lastName),
-      email: decrypt(row.email)
-    }));
+    // Decrypt sensitive fields and filter rows
+    const filteredRows = rows
+      .map((row) => ({
+        ...row,
+        firstName: decrypt(row.firstName),
+        lastName: decrypt(row.lastName),
+        email: decrypt(row.email)
+      }))
+      .filter((row) =>
+        authenticatedUser === "patient" ? row.email === userEmail : true
+      );
 
-    res.json({ patients: decryptedRows });
+    res.json({ patients: filteredRows });
   });
 });
 

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 
-const Login = ({ setAuthenticatedUser }) => {
+const Login = ({ setAuthenticatedUser, setUserEmail }) => {
   const doctorEmail = "doctor@example.com";
   const doctorPassword = "Doctor_Test%1234#";
   const nurseEmail = "nurse@example.com";
@@ -95,6 +95,7 @@ const Login = ({ setAuthenticatedUser }) => {
           }
 
           localStorage.setItem("user_email", email);
+          setUserEmail(email);
 
           Swal.fire({
             icon: "success",
