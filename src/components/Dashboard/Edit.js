@@ -76,7 +76,6 @@ const Edit = ({
       }
     }
 
-    // localStorage.setItem("patients_data", JSON.stringify(patients));
     setPatients(patients);
 
     Swal.fire({

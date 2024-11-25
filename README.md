@@ -10,16 +10,22 @@ This app consists of a few security techniques:
 
 - This app allows for a doctor, nurse, or patient to login.
 - Different dashboard operations and data or viewable for the certain role logged in.
+  - A Doctor can see all patients and perfrom Add/Edit operations on every patient.
+  - A Nurse can see all patients, but only Add and Edit specific fields for a patient.
+  - A Patient can only see their data. No Add/Edit operations available.
 
 2. RuBAC (Rule-Base Access Control)
 
 To demostrate this security measure, we have emplaced a few rules to simulate HIPPA compliance that a real-world application would have to follow:
 
-- Allow Access only during specifc hours. For example, a nurse shall only have access to the system during her working hours (6am - 6pm CST)
+- Allow Access only during specifc hours.
+  - For example, a nurse shall only have access to the system during her working hours (6am - 6pm CST).
 
 3. Encryption
 
 - Saving patient data should be encrypted using AES encryption algorithm.
+  - All login passwords are encrypted and then decypted when logging in.
+  - Sensitive data such as first name, last name, and email are all encrypted as well in the database.
 - Doctors shall be able to sign off on a patient using their RSA encrypted private key.
 
 ## Technologies Used

@@ -3,14 +3,14 @@ import Swal from "sweetalert2";
 
 const Login = ({ setAuthenticatedUser }) => {
   const doctorEmail = "doctor@example.com";
-  const doctorPassword = "Doctor123";
+  const doctorPassword = "Doctor_Test%1234#";
   const nurseEmail = "nurse@example.com";
-  const nursePassword = "Nurse123";
+  const nursePassword = "Nurse_Test%1234#";
   const patientEmail = "patient@example.com";
-  const patientPassword = "Patient123";
+  const patientPassword = "Patient_Test%1234#";
 
   const [email, setEmail] = useState("doctor@example.com");
-  const [password, setPassword] = useState("Doctor123");
+  const [password, setPassword] = useState("Doctor_Test%1234#");
 
   const [nurseLogin, setNurseLogin] = useState(false);
   const [patientLogin, setPatientLogin] = useState(false);

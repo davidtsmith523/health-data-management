@@ -23,7 +23,16 @@ router.post("/patient_info", (req, res) => {
       console.error(err.message);
       return res.status(500).json({ error: err.message });
     }
-    res.json({ patients: rows });
+
+    // Decrypt sensitive fields in each row
+    const decryptedRows = rows.map((row) => ({
+      ...row,
+      firstName: decrypt(row.firstName),
+      lastName: decrypt(row.lastName),
+      email: decrypt(row.email)
+    }));
+
+    res.json({ patients: decryptedRows });
   });
 });
 
@@ -55,15 +64,20 @@ router.post("/add_patient_info", (req, res) => {
     return res.status(400).json({ error: "All fields are required" });
   }
 
+  // Encrypt sensitive fields
+  const encryptedFirstName = encrypt(firstName);
+  const encryptedLastName = encrypt(lastName);
+  const encryptedEmail = encrypt(email);
+
   const query = `
     INSERT INTO patient_info (firstName, lastName, email, dateOfBirth, lastVisit, assignedTo, condition, action, status)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const params = [
-    firstName,
-    lastName,
-    email,
+    encryptedFirstName,
+    encryptedLastName,
+    encryptedEmail,
     dateOfBirth,
     lastVisit,
     assignedTo,
@@ -105,6 +119,11 @@ router.put("/edit_patient_info", (req, res) => {
       .json({ error: "Patient ID is required for updating" });
   }
 
+  // Encrypt sensitive fields
+  const encryptedFirstName = encrypt(firstName);
+  const encryptedLastName = encrypt(lastName);
+  const encryptedEmail = encrypt(email);
+
   const query = `
     UPDATE patient_info
     SET 
@@ -121,9 +140,9 @@ router.put("/edit_patient_info", (req, res) => {
   `;
 
   const params = [
-    firstName,
-    lastName,
-    email,
+    encryptedFirstName,
+    encryptedLastName,
+    encryptedEmail,
     dateOfBirth,
     lastVisit,
     assignedTo,

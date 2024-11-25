@@ -12,11 +12,6 @@ const Dashboard = ({ setAuthenticatedUser, authenticatedUser, userEmail }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  // useEffect(() => {
-  //   const data = JSON.parse(localStorage.getItem("patients_data"));
-  //   if (data !== null && Object.keys(data).length !== 0) setPatients(data);
-  // }, []);
-
   useEffect(() => {
     const fetchPatients = async () => {
       try {
@@ -75,7 +70,6 @@ const Dashboard = ({ setAuthenticatedUser, authenticatedUser, userEmail }) => {
         });
 
         const patientsCopy = patients.filter((patient) => patient.id !== id);
-        localStorage.setItem("patients_data", JSON.stringify(patientsCopy));
         setPatients(patientsCopy);
       }
     });
