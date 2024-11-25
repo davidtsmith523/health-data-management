@@ -23,7 +23,7 @@ const Edit = ({
   const [action, setAction] = useState(selectedPatient.action);
   const [status, setStatus] = useState(selectedPatient.status);
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
 
     if (
@@ -58,6 +58,17 @@ const Edit = ({
       status
     };
 
+    const success = await editPatient(patient);
+    setIsEditing(false);
+    if (!success) {
+      return Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "Failed to add patient.",
+        showConfirmButton: true
+      });
+    }
+
     for (let i = 0; i < patients.length; i++) {
       if (patients[i].id === id) {
         patients.splice(i, 1, patient);
@@ -65,9 +76,8 @@ const Edit = ({
       }
     }
 
-    localStorage.setItem("patients_data", JSON.stringify(patients));
+    // localStorage.setItem("patients_data", JSON.stringify(patients));
     setPatients(patients);
-    setIsEditing(false);
 
     Swal.fire({
       icon: "success",
@@ -76,6 +86,29 @@ const Edit = ({
       showConfirmButton: false,
       timer: 1500
     });
+  };
+
+  const editPatient = async (patient) => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/users/edit_patient_info",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(patient)
+        }
+      );
+
+      if (!response.ok) {
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   return (

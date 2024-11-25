@@ -81,6 +81,10 @@ const Dashboard = ({ setAuthenticatedUser, authenticatedUser, userEmail }) => {
     });
   };
 
+  if (authenticatedUser === null) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="container">
       {!isAdding && !isEditing && (

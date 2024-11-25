@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import { statusOptions } from "../../Options/statusOptions";
 import { doctors } from "../../Options/doctors";
-
 const Add = ({ patients, setPatients, setIsAdding }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -14,10 +13,8 @@ const Add = ({ patients, setPatients, setIsAdding }) => {
   const [condition, setCondition] = useState("");
   const [action, setAction] = useState("");
   const [status, setStatus] = useState("");
-
   const handleAdd = async (e) => {
     e.preventDefault();
-
     if (
       !firstName ||
       !lastName ||
@@ -36,10 +33,7 @@ const Add = ({ patients, setPatients, setIsAdding }) => {
         showConfirmButton: true
       });
     }
-
-    const id = patients.length + 1;
-    const newPatients = {
-      id,
+    const newPatient = {
       firstName,
       lastName,
       email,
@@ -51,27 +45,18 @@ const Add = ({ patients, setPatients, setIsAdding }) => {
       status
     };
 
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/users/add_patient_info",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(newPatients)
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const responseData = await response.json();
-      console.log("Server response:", responseData);
-    } catch (error) {
-      console.error("Error posting data:", error);
+    const success = await addNewPatient(newPatient);
+    setIsAdding(false);
+    if (!success) {
+      return Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "Failed to add patient.",
+        showConfirmButton: true
+      });
     }
+    patients.push(newPatient);
+    setPatients(patients);
 
     Swal.fire({
       icon: "success",
@@ -80,6 +65,32 @@ const Add = ({ patients, setPatients, setIsAdding }) => {
       showConfirmButton: false,
       timer: 1500
     });
+  };
+
+  const addNewPatient = async (newPatient) => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/users/add_patient_info",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(newPatient)
+        }
+      );
+
+      if (!response.ok) {
+        // const errorData = await response.json();
+        return false;
+        // throw new Error(errorData.error || "Failed to add patient");
+      }
+
+      return true;
+    } catch (error) {
+      return false;
+      // console.error("Error adding patient:", error.message);
+    }
   };
 
   return (
@@ -189,5 +200,4 @@ Add.propTypes = {
   setPatients: PropTypes.func.isRequired,
   setIsAdding: PropTypes.func.isRequired
 };
-
 export default Add;

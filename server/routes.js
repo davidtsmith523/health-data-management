@@ -27,7 +27,7 @@ router.post("/patient_info", (req, res) => {
   });
 });
 
-// Route to add new patient info
+// Add a new patient
 router.post("/add_patient_info", (req, res) => {
   const {
     firstName,
@@ -41,39 +41,110 @@ router.post("/add_patient_info", (req, res) => {
     status
   } = req.body;
 
-  // Validate required fields
-  if (!firstName || !lastName || !email || !dateOfBirth) {
-    return res.status(400).json({ error: "Missing required fields" });
+  if (
+    !firstName ||
+    !lastName ||
+    !email ||
+    !dateOfBirth ||
+    !lastVisit ||
+    !assignedTo ||
+    !condition ||
+    !action ||
+    !status
+  ) {
+    return res.status(400).json({ error: "All fields are required" });
   }
 
-  const sql = `
-    INSERT INTO Patient_Info 
-    (firstName, lastName, email, dateOfBirth, lastVisit, assignedTo, condition, action, status) 
+  const query = `
+    INSERT INTO patient_info (firstName, lastName, email, dateOfBirth, lastVisit, assignedTo, condition, action, status)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  db.run(
-    sql,
-    [
-      firstName,
-      lastName,
-      email,
-      dateOfBirth,
-      lastVisit,
-      assignedTo,
-      condition,
-      action,
-      status
-    ],
-    function (err) {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res
-        .status(201)
-        .json({ message: "Patient added successfully", id: this.lastID });
+  const params = [
+    firstName,
+    lastName,
+    email,
+    dateOfBirth,
+    lastVisit,
+    assignedTo,
+    condition,
+    action,
+    status
+  ];
+
+  db.run(query, params, function (err) {
+    if (err) {
+      console.error(err.message);
+      return res.status(500).json({ error: "Failed to add patient" });
     }
-  );
+
+    res
+      .status(201)
+      .json({ message: "Patient added successfully", patientId: this.lastID });
+  });
+});
+
+// Edit an existing patient
+router.put("/edit_patient_info", (req, res) => {
+  const {
+    id,
+    firstName,
+    lastName,
+    email,
+    dateOfBirth,
+    lastVisit,
+    assignedTo,
+    condition,
+    action,
+    status
+  } = req.body;
+
+  if (!id) {
+    return res
+      .status(400)
+      .json({ error: "Patient ID is required for updating" });
+  }
+
+  const query = `
+    UPDATE patient_info
+    SET 
+      firstName = ?,
+      lastName = ?,
+      email = ?,
+      dateOfBirth = ?,
+      lastVisit = ?,
+      assignedTo = ?,
+      condition = ?,
+      action = ?,
+      status = ?
+    WHERE id = ?
+  `;
+
+  const params = [
+    firstName,
+    lastName,
+    email,
+    dateOfBirth,
+    lastVisit,
+    assignedTo,
+    condition,
+    action,
+    status,
+    id
+  ];
+
+  db.run(query, params, function (err) {
+    if (err) {
+      console.error(err.message);
+      return res.status(500).json({ error: "Failed to update patient" });
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({ error: "Patient not found" });
+    }
+
+    res.status(200).json({ message: "Patient updated successfully" });
+  });
 });
 
 // Check email and password login

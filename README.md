@@ -2,8 +2,6 @@
     Health Data Management App
 </h1>
 
-## Health Data Management App
-
 This is an application with a basic UI to simulate a health management system. The main goal of this application is to use the secruity techniques learned in class to demonstrate how secruity is a crucial part to software.
 
 This app consists of a few security techniques:
@@ -65,6 +63,10 @@ and then you can open http://localhost:3000 to view it in the browser.
 ### Backend
 
 Install dependencies:
+
+```
+cd /server
+```
 
 ```
 npm install
