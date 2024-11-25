@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";
-
 import Header from "./Header";
 import Table from "./Table";
 import Add from "./Add";
 import Edit from "./Edit";
 
-import { patientData } from "../../PatientData/data";
-
 const Dashboard = ({ setAuthenticatedUser, authenticatedUser, userEmail }) => {
-  const [patients, setPatients] = useState(patientData);
+  const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -21,15 +18,33 @@ const Dashboard = ({ setAuthenticatedUser, authenticatedUser, userEmail }) => {
   // }, []);
 
   useEffect(() => {
-    if (authenticatedUser === "patient") {
-      let patientCopy = [];
-      patientData.forEach((patient, i) => {
-        if (patient.email === userEmail) {
-          patientCopy.push(patient);
+    const fetchPatients = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/users/patient_info",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              authenticatedUser: authenticatedUser,
+              userEmail: userEmail
+            })
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-      });
-      setPatients(patientCopy);
-    }
+
+        const data = await response.json();
+        setPatients(data.patients);
+      } catch (error) {
+        console.error("Error fetching patient info:", error.message);
+      }
+    };
+    fetchPatients();
   }, [authenticatedUser, userEmail]);
 
   const handleEdit = (id) => {

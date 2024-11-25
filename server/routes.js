@@ -3,46 +3,89 @@ const { decrypt, encrypt } = require("./helpers");
 const router = express.Router();
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("./healthcare_data.db");
+const moment = require("moment-timezone");
 
 // Get all users
-router.get("/patient_info", (req, res) => {
-  db.all("SELECT * FROM Patient_Info", (err, rows) => {
+router.post("/patient_info", (req, res) => {
+  const { authenticatedUser, userEmail } = req.body;
+
+  let query = "SELECT * FROM Patient_Info";
+  let params = [];
+
+  // If authenticatedUser is 'patient', filter by email
+  if (authenticatedUser === "patient" && userEmail) {
+    query += " WHERE email = ?";
+    params.push(userEmail);
+  }
+
+  db.all(query, params, (err, rows) => {
     if (err) {
+      console.error(err.message);
       return res.status(500).json({ error: err.message });
     }
     res.json({ patients: rows });
   });
 });
 
-// Add a new user
+// Route to add new patient info
 router.post("/add_patient_info", (req, res) => {
-  const { name } = req.body;
+  const {
+    firstName,
+    lastName,
+    email,
+    dateOfBirth,
+    lastVisit,
+    assignedTo,
+    condition,
+    action,
+    status
+  } = req.body;
+
+  // Validate required fields
+  if (!firstName || !lastName || !email || !dateOfBirth) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
 
   const sql = `
-  INSERT INTO Patient_Info (first_name, last_name, dob, last_visit, action_required, status, condition, doctor_assigned) 
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-  const params = [
-    req.body.firstName,
-    req.body.lastName,
-    req.body.dateOfBirth,
-    req.body.lastVisit,
-    req.body.action,
-    req.body.status,
-    req.body.condition,
-    req.body.assignedTo
-  ];
+    INSERT INTO Patient_Info 
+    (firstName, lastName, email, dateOfBirth, lastVisit, assignedTo, condition, action, status) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
 
-  db.run(sql, params, function (err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+  db.run(
+    sql,
+    [
+      firstName,
+      lastName,
+      email,
+      dateOfBirth,
+      lastVisit,
+      assignedTo,
+      condition,
+      action,
+      status
+    ],
+    function (err) {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res
+        .status(201)
+        .json({ message: "Patient added successfully", id: this.lastID });
     }
-    res.json({ id: this.lastID, name });
-  });
+  );
 });
 
 // Check email and password login
 router.post("/login", (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, authenticated_user } = req.body;
+
+  // If the authenticated_user is 'nurse', check if it's within allowed hours (6 AM - 6 PM CST)
+  if (authenticated_user === "nurse" && !isWithinAllowedHours()) {
+    return res.status(403).json({
+      error: "Access is restricted to between 6 AM and 6 PM CST for nurses."
+    });
+  }
 
   db.get("SELECT * FROM patient_login WHERE email = ?", [email], (err, row) => {
     if (err) {
@@ -81,5 +124,14 @@ router.post("/register", (req, res) => {
     }
   );
 });
+
+// Helper function to check if the time is between 6 AM and 6 PM CST
+function isWithinAllowedHours() {
+  const currentTime = moment().tz("America/Chicago"); // CST timezone
+  const startOfDay = currentTime.clone().startOf("day").add(6, "hours"); // 6 AM
+  const endOfDay = currentTime.clone().startOf("day").add(18, "hours"); // 6 PM
+
+  return currentTime.isBetween(startOfDay, endOfDay);
+}
 
 module.exports = router;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Swal from "sweetalert2";
 
 const Login = ({ setAuthenticatedUser }) => {
@@ -40,68 +40,40 @@ const Login = ({ setAuthenticatedUser }) => {
     setPassword(doctorPassword);
   };
 
-  // const handleHereClick = () => {
-  //   console.log("here")
-  // }
-
-  const checkHours = () => {
-    const date = new Date();
-    const CSTOffset = -6 * 60;
-    const CSTTime = new Date(date.getTime() + CSTOffset * 60 * 1000);
-
-    const currentHour = CSTTime.getHours();
-
-    if (currentHour >= 6 && currentHour < 18) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
   const checkCredentials = async () => {
-    const response = await fetch("http://localhost:5000/api/users/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email, password })
-    });
+    try {
+      const response = await fetch("http://localhost:5000/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          authenticated_user: nurseLogin
+            ? "nurse"
+            : patientLogin
+            ? "patient"
+            : "doctor"
+        })
+      });
 
-    if (!response.ok) {
-      //throw new Error(`HTTP error! Status: ${response.status}`);
-      return false;
-    } else {
-      return true;
+      if (!response.ok) {
+        const data = await response.json();
+        return { success: false, error: data.error };
+      }
+      return { success: true, error: response.data };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
-
-    // if (
-    //   nurseLogin &&
-    //   email === nurseEmail &&
-    //   password === nursePassword &&
-    //   checkHours()
-    // ) {
-    //   return true;
-    // } else if (
-    //   patientLogin &&
-    //   email === patientEmail &&
-    //   password === patientPassword
-    // ) {
-    //   return true;
-    // } else if (
-    //   doctorLogin &&
-    //   email === doctorEmail &&
-    //   password === doctorPassword
-    // ) {
-    //   return true;
-    // } else {
-    //   return false;
-    // }
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (checkCredentials()) {
+    const check = await checkCredentials();
+
+    if (check.success === true) {
       Swal.fire({
         timer: 1500,
         showConfirmButton: false,
@@ -143,7 +115,7 @@ const Login = ({ setAuthenticatedUser }) => {
           Swal.fire({
             icon: "error",
             title: "Error!",
-            text: "Incorrect email or password.",
+            text: check.error,
             showConfirmButton: true
           });
         }
