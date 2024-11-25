@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 
 const Login = ({ setAuthenticatedUser }) => {
@@ -44,8 +44,6 @@ const Login = ({ setAuthenticatedUser }) => {
   //   console.log("here")
   // }
 
-
-
   const checkHours = () => {
     const date = new Date();
     const CSTOffset = -6 * 60;
@@ -60,29 +58,44 @@ const Login = ({ setAuthenticatedUser }) => {
     }
   };
 
-  const checkCredentials = () => {
-    if (
-      nurseLogin &&
-      email === nurseEmail &&
-      password === nursePassword &&
-      checkHours()
-    ) {
-      return true;
-    } else if (
-      patientLogin &&
-      email === patientEmail &&
-      password === patientPassword
-    ) {
-      return true;
-    } else if (
-      doctorLogin &&
-      email === doctorEmail &&
-      password === doctorPassword
-    ) {
-      return true;
-    } else {
+  const checkCredentials = async () => {
+    const response = await fetch("http://localhost:5000/api/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    if (!response.ok) {
+      //throw new Error(`HTTP error! Status: ${response.status}`);
       return false;
+    } else {
+      return true;
     }
+
+    // if (
+    //   nurseLogin &&
+    //   email === nurseEmail &&
+    //   password === nursePassword &&
+    //   checkHours()
+    // ) {
+    //   return true;
+    // } else if (
+    //   patientLogin &&
+    //   email === patientEmail &&
+    //   password === patientPassword
+    // ) {
+    //   return true;
+    // } else if (
+    //   doctorLogin &&
+    //   email === doctorEmail &&
+    //   password === doctorPassword
+    // ) {
+    //   return true;
+    // } else {
+    //   return false;
+    // }
   };
 
   const handleLogin = (e) => {

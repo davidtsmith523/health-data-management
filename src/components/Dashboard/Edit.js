@@ -15,6 +15,7 @@ const Edit = ({
 
   const [firstName, setFirstName] = useState(selectedPatient.firstName);
   const [lastName, setLastName] = useState(selectedPatient.lastName);
+  const [email, setEmail] = useState(selectedPatient.email);
   const [dateOfBirth, setDateOfBirth] = useState(selectedPatient.dateOfBirth);
   const [lastVisit, setLastVisit] = useState(selectedPatient.lastVisit);
   const [assignedTo, setAssignedTo] = useState(selectedPatient.assignedTo);
@@ -28,6 +29,7 @@ const Edit = ({
     if (
       !firstName ||
       !lastName ||
+      !email ||
       !dateOfBirth ||
       !lastVisit ||
       !assignedTo ||
@@ -47,6 +49,7 @@ const Edit = ({
       id,
       firstName,
       lastName,
+      email,
       dateOfBirth,
       lastVisit,
       assignedTo,
@@ -95,6 +98,15 @@ const Edit = ({
           name="lastName"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
+          disabled={authenticatedUser === "nurse"}
+        />
+        <label htmlFor="email">Email</label>
+        <input
+          id="email"
+          type="text"
+          name="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           disabled={authenticatedUser === "nurse"}
         />
         <label htmlFor="dateOfBirth">Date of Birth</label>

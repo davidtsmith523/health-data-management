@@ -7,6 +7,7 @@ import { doctors } from "../../Options/doctors";
 const Add = ({ patients, setPatients, setIsAdding }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [lastVisit, setLastVisit] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
@@ -20,6 +21,7 @@ const Add = ({ patients, setPatients, setIsAdding }) => {
     if (
       !firstName ||
       !lastName ||
+      !email ||
       !dateOfBirth ||
       !lastVisit ||
       !assignedTo ||
@@ -40,6 +42,7 @@ const Add = ({ patients, setPatients, setIsAdding }) => {
       id,
       firstName,
       lastName,
+      email,
       dateOfBirth,
       lastVisit,
       assignedTo,
@@ -49,22 +52,25 @@ const Add = ({ patients, setPatients, setIsAdding }) => {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/api/users/add_patient_info', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newPatients),
-      });
+      const response = await fetch(
+        "http://localhost:5000/api/users/add_patient_info",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(newPatients)
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
       const responseData = await response.json();
-      console.log('Server response:', responseData);
+      console.log("Server response:", responseData);
     } catch (error) {
-      console.error('Error posting data:', error);
+      console.error("Error posting data:", error);
     }
 
     Swal.fire({
@@ -95,6 +101,14 @@ const Add = ({ patients, setPatients, setIsAdding }) => {
           name="lastName"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
+        />
+        <label htmlFor="email">Email</label>
+        <input
+          id="email"
+          type="text"
+          name="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <label htmlFor="dateOfBirth">Date Of Birth</label>
         <input
