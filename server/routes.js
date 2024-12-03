@@ -25,6 +25,39 @@ router.post("/sign_patient_info", (req, res) => {
 
   try {
     const signature = signData(patientData);
+    const patientId = patientData.id;
+    const doctorName = patientData.assignedTo;
+    const queryInsertSignature = `
+        INSERT INTO Signatures (patient_id, signed_off_by, signature)
+        VALUES (?, ?, ?)
+      `;
+
+    db.run(
+      queryInsertSignature,
+      [patientId, doctorName, signature],
+      function (err) {
+        if (err) {
+          console.error("Error inserting signature:", err.message);
+          return;
+        }
+
+        const signatureId = this.lastID; // Get the ID of the inserted signature
+
+        const queryUpdatePatient = `
+        UPDATE Patient_Info
+        SET signature_id = ?
+        WHERE id = ?
+      `;
+
+        db.run(queryUpdatePatient, [signatureId, patientId], (err) => {
+          if (err) {
+            console.error("Error updating patient info:", err.message);
+          } else {
+            console.log("Patient signed off successfully!");
+          }
+        });
+      }
+    );
     res.json({ signature });
   } catch (error) {
     console.error("Signing error:", error.message);
