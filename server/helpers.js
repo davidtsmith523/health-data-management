@@ -86,8 +86,8 @@ function decryptWithAESAndRSA({ encryptedData, encryptedKey }, rsaPrivateKey) {
 
 function signData(data) {
   const rsaKey = new NodeRSA(rsaPrivateKey, "pkcs1");
-  // const hashData = crypto.createHash('sha256').update(data).digest('hex');
-  const signature = rsaKey.sign(data, "base64");
+  const hashData = crypto.createHash('sha256').update(data).digest('hex');
+  const signature = rsaKey.sign(hashData, "base64");
   return signature;
 }
 
