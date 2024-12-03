@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-const Table = ({ authenticatedUser, patients, handleEdit, handleDelete }) => {
+const Table = ({ authenticatedUser, patients, handleEdit, handleDelete, handleSignOff }) => {
   patients.forEach((patient, i) => {
     patient.id = i + 1;
   });
@@ -52,6 +52,12 @@ const Table = ({ authenticatedUser, patients, handleEdit, handleDelete }) => {
                       className="button muted-button"
                     >
                       Delete
+                    </button>
+                    <button
+                      onClick={() => handleSignOff(patient.id)}
+                      className="button muted-button"
+                    >
+                      Sign Off
                     </button>
                   </td>
                 )}

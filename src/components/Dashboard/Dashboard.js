@@ -5,18 +5,21 @@ import Header from "./Header";
 import Table from "./Table";
 import Add from "./Add";
 import Edit from "./Edit";
+import fetchPublicKey from "../../encryption/helpers.js"
 
 const Dashboard = ({ setAuthenticatedUser, authenticatedUser, userEmail }) => {
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [signature, setSignature] = useState(''); 
 
   useEffect(() => {
     const fetchPatients = async () => {
       try {
+        // const { encryptedAESKey } = await encryptData('');
         const response = await fetch(
-          "http://localhost:5000/api/users/patient_info",
+          "http://localhost:5001/api/users/patient_info",
           {
             method: "POST",
             headers: {
@@ -48,6 +51,58 @@ const Dashboard = ({ setAuthenticatedUser, authenticatedUser, userEmail }) => {
     setSelectedPatient(patient);
     setIsEditing(true);
   };
+
+  const handleSignOff = async (id) => {
+    Swal.fire({
+      icon: "warning",
+      title: "Approve Patient Info",
+      text: "You must be the assigned doctor.",
+      showCancelButton: true,
+      confirmButtonText: "Sign Off",
+      cancelButtonText: "No, cancel!"
+    }).then(async (result) => {
+      if (result.value) {
+        const [patient] = patients.filter((patient) => patient.id === id);
+        try { 
+          const signature = await signPatientData(patient); 
+          setSignature(signature); 
+          Swal.fire({
+            icon: "success",
+            title: "Signed off!",
+            text: `${patient.firstName} ${patient.lastName}'s data has been signed off.`,
+            showConfirmButton: false,
+            timer: 1500
+          });
+        } catch (error) { 
+          Swal.fire({
+            icon: "error",
+            title: "Unable to sign off!",
+            text: `${patient.firstName} ${patient.lastName}'s data failed to be signed off.`,
+            showConfirmButton: false,
+            timer: 1500
+          });
+          console.error('Failed to sign patient data:', error); 
+        }
+      }
+    });
+  };
+
+  async function signPatientData(patientData) {
+    console.log(patientData);
+    const response = await fetch('http://localhost:5001/api/users/sign_patient_info', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ patientData }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    const { signature } = await response.json();
+    return signature;
+  }
 
   const handleDelete = (id) => {
     Swal.fire({
@@ -93,6 +148,7 @@ const Dashboard = ({ setAuthenticatedUser, authenticatedUser, userEmail }) => {
             patients={patients}
             handleEdit={handleEdit}
             handleDelete={handleDelete}
+            handleSignOff={handleSignOff}
           />
         </>
       )}
