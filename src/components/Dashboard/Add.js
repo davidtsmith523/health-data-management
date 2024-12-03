@@ -70,7 +70,7 @@ const Add = ({ patients, setPatients, setIsAdding }) => {
   const addNewPatient = async (newPatient) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/users/add_patient_info",
+        "http://localhost:5001/api/users/add_patient_info",
         {
           method: "POST",
           headers: {
