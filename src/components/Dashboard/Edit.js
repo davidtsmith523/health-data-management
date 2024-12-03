@@ -90,7 +90,7 @@ const Edit = ({
   const editPatient = async (patient) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/users/edit_patient_info",
+        "http://localhost:5001/api/users/edit_patient_info",
         {
           method: "PUT",
           headers: {

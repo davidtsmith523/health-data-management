@@ -5,7 +5,7 @@ const DataFetcher = () => {
 
   useEffect(() => {
     // console.log(data)
-    fetch('http://localhost:5000/api/users/patient_info')
+    fetch('http://localhost:5001/api/users/patient_info')
       .then(response => response.json())
       .then(response => setData(response.patients))
     //   .then(console.log(data))
