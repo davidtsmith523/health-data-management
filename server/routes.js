@@ -12,23 +12,23 @@ const rsaPublicKey = fs.readFileSync("./keys/publicKey.pem", "utf8");
 
 // Get RSA Public Key
 router.get("/get-rsa-public-key", (req, res) => {
-  try { 
-    res.json({ rsaPublicKey }); 
+  try {
+    res.json({ rsaPublicKey });
   } catch (error) {
     console.error("Failed:", error.message);
     res.status(500).json({ error: "Could not get key." });
   }
 });
 
-router.post('/sign_patient_info', (req, res) => {
+router.post("/sign_patient_info", (req, res) => {
   const { patientData } = req.body;
 
   try {
-      const signature = signData(patientData);
-      res.json({ signature });
+    const signature = signData(patientData);
+    res.json({ signature });
   } catch (error) {
-      console.error('Signing error:', error.message);
-      res.status(500).json({ error: 'Failed to sign data.' });
+    console.error("Signing error:", error.message);
+    res.status(500).json({ error: "Failed to sign data." });
   }
 });
 
@@ -187,6 +187,30 @@ router.put("/edit_patient_info", (req, res) => {
     }
 
     res.status(200).json({ message: "Patient updated successfully" });
+  });
+});
+
+// Delete a patient by email
+router.delete("/delete_patient", (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ error: "Email is required for deletion" });
+  }
+
+  const query = `DELETE FROM patient_info WHERE id = ?`;
+
+  db.run(query, [id], function (err) {
+    if (err) {
+      console.error(err.message);
+      return res.status(500).json({ error: "Failed to delete patient" });
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({ error: "patient not found" });
+    }
+
+    res.status(200).json({ message: "patient deleted successfully" });
   });
 });
 
