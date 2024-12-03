@@ -40,7 +40,6 @@ function decrypt(encryptedText) {
   return decrypted;
 }
 
-
 function encryptWithAESAndRSA(text, rsaPublicKey) {
   const aesKey = crypto.randomBytes(32); // Generate a random AES key
   const keyBuffer = Buffer.from(SECRET_KEY, "hex");
@@ -55,18 +54,18 @@ function encryptWithAESAndRSA(text, rsaPublicKey) {
   encrypted += cipher.final("hex");
   const ivAndEncryptedText = iv.toString("hex") + ":" + encrypted; // Store IV + Encrypted text
   const rsaKey = new NodeRSA(rsaPublicKey);
-  const encryptedAESKey = rsaKey.encrypt(aesKey, 'base64');
+  const encryptedAESKey = rsaKey.encrypt(aesKey, "base64");
 
   return {
     encryptedData: ivAndEncryptedText,
-    encryptedKey: encryptedAESKey,
+    encryptedKey: encryptedAESKey
   };
 }
 
 // AES decryption function
 function decryptWithAESAndRSA({ encryptedData, encryptedKey }, rsaPrivateKey) {
   const rsaKey = new NodeRSA(rsaPrivateKey);
-  const decryptedAESKey = rsaKey.decrypt(encryptedKey, 'utf8');
+  const decryptedAESKey = rsaKey.decrypt(encryptedKey, "utf8");
   const keyBuffer = Buffer.from(decryptedAESKey, "hex");
   if (Buffer.from(keyBuffer, "hex").length !== 32) {
     throw new Error("Invalid key length. AES-256 requires a 32-byte key.");
@@ -74,27 +73,35 @@ function decryptWithAESAndRSA({ encryptedData, encryptedKey }, rsaPrivateKey) {
   const [ivHex, encryptedHex] = encryptedData.split(":");
   const iv = Buffer.from(ivHex, "hex");
   const encryptedBuffer = Buffer.from(encryptedHex, "hex");
-  const decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(decryptedAESKey, "hex"), iv);
+  const decipher = crypto.createDecipheriv(
+    "aes-256-cbc",
+    Buffer.from(decryptedAESKey, "hex"),
+    iv
+  );
   let decrypted = decipher.update(encryptedBuffer, "hex", "utf8");
   decrypted += decipher.final("utf8");
 
   return decrypted;
 }
 
-function signData(data) { 
-  console.log("WTF");
-  console.log(rsaPrivateKey);
-  const rsaKey = new NodeRSA(rsaPrivateKey, 'pkcs1'); 
+function signData(data) {
+  const rsaKey = new NodeRSA(rsaPrivateKey, "pkcs1");
   // const hashData = crypto.createHash('sha256').update(data).digest('hex');
-  const signature = rsaKey.sign(data, 'base64');
+  const signature = rsaKey.sign(data, "base64");
   return signature;
 }
 
 function verifySignature(data, signature, publicKey) {
   const rsaKey = new NodeRSA(publicKey);
-  const isVerified = rsaKey.verify(data, signature, 'utf8', 'base64');
+  const isVerified = rsaKey.verify(data, signature, "utf8", "base64");
   return isVerified;
 }
 
-
-module.exports = { encrypt, decrypt, encryptWithAESAndRSA, decryptWithAESAndRSA, signData, verifySignature };
+module.exports = {
+  encrypt,
+  decrypt,
+  encryptWithAESAndRSA,
+  decryptWithAESAndRSA,
+  signData,
+  verifySignature
+};

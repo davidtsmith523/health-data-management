@@ -6,7 +6,7 @@ This is an application with a basic UI to simulate a health management system. T
 
 This app consists of a few security techniques:
 
-1. RBAC (Role-Base Access Control)
+1. RBAC (Role-Based Access Control)
 
 - This app allows for a doctor, nurse, or patient to login.
 - Different dashboard operations and data or viewable for the certain role logged in.
@@ -14,7 +14,7 @@ This app consists of a few security techniques:
   - A Nurse can see all patients, but only Add and Edit specific fields for a patient.
   - A Patient can only see their data. No Add/Edit operations available.
 
-2. RuBAC (Rule-Base Access Control)
+2. RuBAC (Rule-Based Access Control)
 
 To demostrate this security measure, we have emplaced a few rules to simulate HIPPA compliance that a real-world application would have to follow:
 
@@ -68,11 +68,11 @@ and then you can open http://localhost:3000 to view it in the browser.
 
 ### Backend
 
-Install dependencies:
+```
+cd health-data-management-app/server
+```
 
-```
-cd /server
-```
+Install dependencies:
 
 ```
 npm install
@@ -83,3 +83,5 @@ Now, you can start a local server by running:
 ```
 npm start
 ```
+
+Open http://localhost:3000 to view the application.
