@@ -1,11 +1,37 @@
 const express = require("express");
-const { decrypt, encrypt } = require("./helpers");
+const { signData, decrypt, encrypt } = require("./helpers");
 const router = express.Router();
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("./healthcare_data.db");
 const moment = require("moment-timezone");
+const fs = require("fs");
+const NodeRSA = require("node-rsa");
 
-// Get all users
+const rsaPrivateKey = fs.readFileSync("./keys/privateKey.pem", "utf8");
+const rsaPublicKey = fs.readFileSync("./keys/publicKey.pem", "utf8");
+
+// Get RSA Public Key
+router.get("/get-rsa-public-key", (req, res) => {
+  try { 
+    res.json({ rsaPublicKey }); 
+  } catch (error) {
+    console.error("Failed:", error.message);
+    res.status(500).json({ error: "Could not get key." });
+  }
+});
+
+router.post('/sign_patient_info', (req, res) => {
+  const { patientData } = req.body;
+
+  try {
+      const signature = signData(patientData);
+      res.json({ signature });
+  } catch (error) {
+      console.error('Signing error:', error.message);
+      res.status(500).json({ error: 'Failed to sign data.' });
+  }
+});
+
 router.post("/patient_info", (req, res) => {
   const { authenticatedUser, userEmail } = req.body;
 
