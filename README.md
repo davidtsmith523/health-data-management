@@ -111,10 +111,10 @@ cd health-data-management-app/server
 npx jest login.test.js
 ```
 
-will run a backend test for the login functionality
+will run a backend test suite for the login functionality
 
 ```
 npx jest addPatient.test.js
 ```
 
-will run a backend test for the add functionality
+will run a backend test suite for the add functionality
