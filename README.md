@@ -85,3 +85,17 @@ npm start
 ```
 
 Open http://localhost:3000 to view the application.
+
+## Test Cases
+1. Log in using the doctor, nurse, and patient
+   - A doctor should be able to see all patients, add new patient, edit existing patient, and delete a patient.
+   - A nurse (if time is between 6am - 6pm CST) should be able to see all patients, add new patient, and edit some properties on an existing patient.
+   - A patient should be able to see only their data, and not be able to add, delete, or edit.
+2. Add a new patient using the doctor log in.
+   - Click on "Add New Patient Data" and fill in all fields. Click "Add". A success message should appear if successful.
+3. Edit an existing patient using the doctor log in.
+   - Click on "Edit" under a patient in the table and edit an existing field. Click "Update". A success message should appear if successful.
+4. Delete an existing patient using the doctor log in.
+   - Click on "Delete" under a patient in the table and confirm deletion. A success message should appear if successful.
+4. Sign Off using the doctor RSA key.
+   - Click on "Sign Off" under a patient in the table and confirm sign off. A success message should appear if successful.
